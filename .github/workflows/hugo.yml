@@ -28,8 +28,9 @@ jobs:
           submodules: recursive
           fetch-depth: 0
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v3
+      # Skip Setup Pages step - requires Pages to be already enabled
+      # Enable GitHub Pages in repository settings first:
+      # Settings → Pages → Source: GitHub Actions
 
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v2
@@ -43,7 +44,10 @@ jobs:
           # Check if site directory exists
           if [ -d "site" ]; then
             echo "Building from site directory"
-            hugo --minify --source site --baseURL "${{ github.event.repository.name }}.github.io/${{ github.event.repository.name }}/"
+            # BaseURL for GitHub Pages project site:
+            # https://<username>.github.io/<repository-name>/
+            # For custom domain or user/organization sites, update this accordingly
+            hugo --minify --source site --baseURL "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
           else
             echo "ERROR: site directory not found"
             echo "Current directory contents:"
