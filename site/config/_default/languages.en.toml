@@ -1,0 +1,25 @@
+languageCode = "en"
+languageName = "English"
+weight = 1
+title = "DevOps Blogs Site"
+
+[params]
+  displayName = "English"
+  isoCode = "en"
+  rtl = false
+  dateFormat = "2 January 2006"
+  logo = "img/blowfish_logo_transparent.png"
+  description = "Personal DevOps blogs site sharing best practices, knowledge transfers, and portfolio projects."
+
+[params.author]
+  name = "Frank"
+  email = ""
+  image = ""
+  headline = "DevOps Engineer"
+  bio = "Sharing DevOps best practices, knowledge transfers, and personal portfolio projects."
+  links = [
+    # Add your social links here
+    # { x-twitter = "https://twitter.com/username" },
+    # { github = "https://github.com/username" },
+    # { linkedin = "https://linkedin.com/in/username" },
+  ]

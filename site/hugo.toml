@@ -1,0 +1,39 @@
+baseURL = 'https://example.org/'
+languageCode = 'en-us'
+title = 'DevOps Blogs Site'
+theme = 'blowfish'
+
+# Default content language
+defaultContentLanguage = 'en'
+defaultContentLanguageInSubdir = false
+
+# Enable Emoji support
+enableEmoji = true
+
+# Build settings
+buildFuture = false
+buildDrafts = true
+buildExpired = false
+
+# Pagination
+paginate = 10
+paginatePath = 'page'
+
+# Taxonomies (to be configured later)
+[taxonomies]
+  category = 'categories'
+  tag = 'tags'
+  technology = 'technologies'
+
+# Sitemap
+[sitemap]
+  changefreq = 'weekly'
+  priority = 0.5
+
+# Security headers (optional)
+[security]
+  [security.http]
+    [security.http.headers]
+      X-Frame-Options = ['DENY']
+      X-Content-Type-Options = ['nosniff']
+      Referrer-Policy = ['strict-origin-when-cross-origin']
