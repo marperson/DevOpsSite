@@ -1,6 +1,6 @@
 +++
 date = '2026-03-15T02:06:05-04:00'
-draft = false
+draft = true
 title = 'Getting Started with Kubernetes: A DevOps Perspective'
 author = 'Frank'
 categories = ['Kubernetes', 'DevOps']
