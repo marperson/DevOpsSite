@@ -11,10 +11,10 @@ I'm always open to discussing DevOps projects, sharing knowledge, or collaborati
 
 ## Contact Information
 
-- **Email**: [your-email@example.com](mailto:your-email@example.com)
-- **LinkedIn**: [Your LinkedIn Profile](https://linkedin.com/in/username)
-- **GitHub**: [Your GitHub Profile](https://github.com/username)
-- **Twitter/X**: [@YourTwitterHandle](https://twitter.com/username)
+- **Email**: [marperson@hotmail.com](mailto:marperson@hotmail.com)
+- **LinkedIn**: [LinkedIn](https://www.linkedin.com/in/frank-h-5a787b24/)
+- **GitHub**: [Your GitHub Profile](https://github.com/marperson)
+- **Twitter/X**: [@TBD](https://twitter.com/username)
 
 ## Consultation Services
 
@@ -31,4 +31,4 @@ I typically respond within 24-48 hours. For urgent matters, please indicate in y
 
 ## Location
 
-Based in [Your City/Region], available for remote collaborations worldwide.
+Based in [East Coate, NA], available for remote collaborations worldwide.
