@@ -25,7 +25,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          submodules: recursive
           fetch-depth: 0
 
       # Skip Setup Pages step - requires Pages to be already enabled

@@ -1,4 +1,4 @@
-baseURL = 'https://example.org/'
+baseURL = 'https://frankhe.github.io/DevOpsSite/'
 languageCode = 'en-us'
 title = 'DevOps Blogs Site'
 theme = 'blowfish'
