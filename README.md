@@ -212,7 +212,7 @@ jobs:
       - name: Setup Hugo
         uses: peaceiris/actions-hugo@v2
         with:
-          hugo-version: 'latest'
+          hugo-version: '0.156.0'  # Pinned due to compatibility with Blowfish theme
           extended: true
 
       - name: Build with Hugo
