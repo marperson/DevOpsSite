@@ -345,27 +345,3 @@ Start minimal, then add:
 * Use config file for efficiency
 * Keep long-running tasks alive
 
----
-
-## 📁 Usage
-
-1. Save this file as:
-
-```
-tmux-guide.md
-```
-
-2. Save your generated image as:
-
-```
-tmux-cover.png
-```
-
-3. Keep both in the same folder.
-
-4. Open in GitHub / Markdown viewer 🚀
-
-```
-
----
-
