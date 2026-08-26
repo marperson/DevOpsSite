@@ -109,40 +109,175 @@ PASSWORD=$(oc get secret logs-es-elastic-user -n logging \
 
 Use the ECK-managed service internally, or expose it through a gateway that preserves HTTPS and forwards to the Elasticsearch HTTP port. Do not expose the transport port publicly.
 
+## Tetrate mesh and TLS boundaries
+
+The examples below target Tetrate 1.2x and use the standard Istio networking APIs. Replace the gateway deployment and service names with the names used by the platform team. The Elasticsearch namespace is assumed to be `logging`.
+
+There are two independent TLS connections:
+
+```text
+Client mTLS / HTTP/1.1 -- TCP passthrough --> Elasticsearch HTTPS :9200
+Leader transport TLS -- TCP passthrough --> Elasticsearch transport :9300
+```
+
+The mesh must not add a second TLS layer to either stream. Configure the Elasticsearch services and ports as TCP, exclude these ports from automatic Istio mTLS origination, and use gateway policy and NetworkPolicies to restrict callers. Elasticsearch remains responsible for its own certificates and peer authentication.
+
 ## T2 Ingress Gateway
 
-The T2 route is the north-south entry point for approved clients such as operators, CI jobs, and applications. Configure it to:
+The T2 route is the north-south entry point for approved clients such as operators, CI jobs, and applications. Port `9200` is configured as TLS passthrough so the client mTLS session reaches the ECK HTTP service unchanged.
 
-1. Terminate or pass through TLS according to the certificate policy.
-2. Forward only to the ECK HTTP service.
-3. Restrict methods and source networks where possible.
-4. Apply authentication and request-size limits.
-5. Preserve the host and authorization headers required by Elasticsearch.
+```yaml
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: elasticsearch-t2
+  namespace: logging
+spec:
+  selector:
+    app: istio-ingressgateway
+  servers:
+    - port:
+        number: 9200
+        name: tcp-elasticsearch-http
+        protocol: TCP
+      hosts:
+        - '*'
+```
+
+The gateway deliberately has no `VirtualService`. The `EnvoyFilter` installs the TCP proxy and points it directly at the ECK HTTP service. This keeps the client mTLS stream opaque from the external listener to Elasticsearch.
+
+```yaml
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: elasticsearch-t2-tcp-passthrough
+  namespace: logging
+spec:
+  workloadSelector:
+    labels:
+      app: istio-ingressgateway
+  configPatches:
+    - applyTo: NETWORK_FILTER
+      match:
+        context: GATEWAY
+        listener:
+          portNumber: 9200
+      patch:
+        operation: INSERT_FIRST
+        value:
+          name: envoy.filters.network.tcp_proxy
+          typed_config:
+            '@type': type.googleapis.com/envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy
+            cluster: outbound|9200||logs-es-http.logging.svc.cluster.local
+            idle_timeout: 15m
+```
+
+Because the route is selected by listener port and the EnvoyFilter supplies the upstream cluster, SNI inspection is unnecessary for this dedicated listener. The filter does not terminate TLS or alter the encrypted request. Confirm that the generated cluster name matches the service port with `istioctl proxy-config clusters`.
+
+TLS passthrough also means Envoy cannot convert HTTP/2 into HTTP/1.1: the HTTP headers are encrypted. Elasticsearch clients must explicitly use HTTP/1.1, for example:
+
+```bash
+curl --http1.1 --fail --cert client.crt --key client.key --cacert elastic-ca.crt \
+  --user "elastic:${PASSWORD}" \
+  "https://search.example.com:9200/_cluster/health?pretty"
+```
+
+Do not use an HTTP filter, HTTP `VirtualService`, or Envoy HTTP connection manager on this path. If the gateway must enforce HTTP/1.1, terminate client TLS at the gateway, configure an HTTP/1.1 upstream cluster, and re-encrypt to Elasticsearch. That is a different security model from mTLS passthrough.
 
 Test the route from an approved client:
 
 ```bash
 curl --fail --user "elastic:${PASSWORD}" \
-  "https://search.example.com/_cluster/health?pretty"
+  "https://search.example.com:9200/_cluster/health?pretty"
 ```
 
 The route should return cluster health without exposing pod or Kubernetes service addresses.
 
 ## East-West Gateway
 
-The East-West Gateway carries replication traffic from Cluster A to Cluster B. Give each cluster a stable DNS name, for example:
+The East-West Gateway carries Elasticsearch transport traffic from Cluster A to Cluster B. For transport-mode remote clusters, expose only port `9300`; this is not an HTTP route and must not have a `VirtualService`.
+
+Give each cluster a stable DNS name, for example:
 
 ```text
 cluster-a-search.example.net
 cluster-b-search.example.net
 ```
 
-The path must support HTTPS to the Elasticsearch HTTP endpoint, certificate validation, DNS resolution, and the expected request timeout:
+The transport path must support Elasticsearch transport TLS, certificate validation, DNS resolution, and the expected request timeout. Test the separate HTTP endpoint with:
 
 ```bash
 curl --fail --user "elastic:${PASSWORD}" \
-  "https://cluster-b-search.example.net/_cluster/health?pretty"
+  "https://cluster-b-search.example.net:9200/_cluster/health?pretty"
 ```
+
+Port `9300` is not an HTTP endpoint, so validate it with an Elasticsearch remote-cluster connection or a TCP/TLS probe rather than `curl`.
+
+The following gateway exposes the transport listener as raw TCP. The remote cluster hostname resolves to the east-west gateway address. Because this example intentionally has no `VirtualService`, the `EnvoyFilter` installs the TCP proxy and points it directly at the target transport service cluster.
+
+```yaml
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: elasticsearch-east-west
+  namespace: logging
+spec:
+  selector:
+    app: istio-ingressgateway
+  servers:
+    - port:
+        number: 9300
+        name: tcp-elasticsearch-transport
+        protocol: TCP
+      hosts:
+        - cluster-a-transport.example.net
+---
+apiVersion: networking.istio.io/v1beta1
+kind: EnvoyFilter
+metadata:
+  name: elasticsearch-east-west-tcp-passthrough
+  namespace: logging
+spec:
+  workloadSelector:
+    labels:
+      app: istio-ingressgateway
+  configPatches:
+    - applyTo: NETWORK_FILTER
+      match:
+        context: GATEWAY
+        listener:
+          portNumber: 9300
+      patch:
+        operation: INSERT_FIRST
+        value:
+          name: envoy.filters.network.tcp_proxy
+          typed_config:
+            '@type': type.googleapis.com/envoy.extensions.filters.network.tcp_proxy.v3.TcpProxy
+            cluster: outbound|9300||logs-es-transport.logging.svc.cluster.local
+            idle_timeout: 30m
+```
+
+Because the `EnvoyFilter` supplies the upstream cluster, no `VirtualService` is needed for the east-west listener. The cluster name must match the generated Istio outbound cluster exactly; confirm it with `istioctl proxy-config clusters`. The Tetrate workspace policy must permit the gateway workload to reach the target service. A representative `WorkspaceSetting` is:
+
+```yaml
+apiVersion: tetrate.io/v2
+kind: WorkspaceSetting
+metadata:
+  name: elasticsearch-east-west
+  namespace: logging
+spec:
+  workspace: logging
+  allowedWorkspaces:
+    - logging
+  serviceAccess:
+    - host: logs-es-transport.logging.svc.cluster.local
+      ports:
+        - 9300
+```
+
+The exact `WorkspaceSetting` fields are installation-specific in Tetrate 1.2x. Treat this manifest as a policy example and validate it against the CRD installed in the management plane with `kubectl explain workspacesetting.spec`. The important requirement is an explicit workspace-to-workspace allow rule for TCP `9300`, not a broad namespace or port wildcard.
+
+Do not repackage Elasticsearch transport TLS as mesh mTLS. The gateway must forward bytes without TLS termination, and the east-west destination must be excluded from automatic mesh TLS origination. Apply the exclusion using the platform's standard `PeerAuthentication`/`DestinationRule` policy for this gateway, or disable sidecar injection for the dedicated TCP gateway workload if that is the approved operational pattern. Do not use `tls.mode: ISTIO_MUTUAL` for the `9300` destination, because that would wrap the Elasticsearch TLS stream in a second TLS session.
 
 Configure firewall rules and NetworkPolicies for the smallest required source and destination set. In production, use a dedicated CCR user with minimum privileges instead of the `elastic` superuser. Store credentials in a secret or gateway-managed credential store.
 
