@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Engineering Presentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .presentation-container {
+            width: 100%;
+            max-width: 1000px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .slide {
+            display: none;
+            min-height: 600px;
+            padding: 60px 40px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Slide Specific Styles */
+        .slide-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .slide-title h1 {
+            font-size: 3em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .slide-title p {
+            font-size: 1.3em;
+            color: #666;
+        }
+
+        .slide h2 {
+            font-size: 2.5em;
+            color: #667eea;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .slide h3 {
+            font-size: 1.5em;
+            color: #764ba2;
+            margin-top: 25px;
+            margin-bottom: 15px;
+        }
+
+        .slide p {
+            font-size: 1.1em;
+            color: #333;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .slide ul {
+            font-size: 1.1em;
+            color: #333;
+            margin-left: 40px;
+            margin-bottom: 20px;
+        }
+
+        .slide li {
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            border-left: 4px solid #667eea;
+        }
+
+        .example-box {
+            background: #e8f4f8;
+            border-left: 4px solid #00bcd4;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .best-practice {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .warning {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .technique-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .technique-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #667eea;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .technique-card h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .technique-card p {
+            font-size: 0.95em;
+            margin: 0;
+        }
+
+        .icon {
+            width: 40px;
+            height: 40px;
+            display: inline-block;
+        }
+
+        /* Navigation */
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .slide-counter {
+            font-size: 1.1em;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e0e0e0;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s;
+        }
+
+        .schema {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 30px 0;
+            gap: 20px;
+        }
+
+        .schema-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #667eea;
+            text-align: center;
+            flex: 1;
+        }
+
+        .schema-arrow {
+            font-size: 2em;
+            color: #667eea;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .comparison-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .highlight {
+            background: #fff59d;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 40px 20px;
+                min-height: auto;
+            }
+
+            .slide h1 {
+                font-size: 2em;
+            }
+
+            .slide h2 {
+                font-size: 1.8em;
+            }
+
+            .technique-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .navigation {
+                padding: 15px 20px;
+            }
+
+            button {
+                padding: 10px 20px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <div class="slide-title">
+                <h1>🎯 Prompt Engineering</h1>
+                <p>From Basics to Advanced Techniques</p>
+                <p style="margin-top: 40px; font-size: 1em; color: #999;">A comprehensive guide for developers</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: What is Prompt Engineering -->
+        <div class="slide">
+            <h2>🤔 What is Prompt Engineering?</h2>
+            <p>Prompt Engineering is the art and science of crafting effective input instructions for AI models to generate desired outputs.</p>
+
+            <div class="schema">
+                <div class="schema-box">Input<br/>(Prompt)</div>
+                <div class="schema-arrow">→</div>
+                <div class="schema-box">AI Model</div>
+                <div class="schema-arrow">→</div>
+                <div class="schema-box">Output<br/>(Response)</div>
+            </div>
+
+            <h3>Key Responsibilities:</h3>
+            <ul>
+                <li>Design clear and specific instructions</li>
+                <li>Provide relevant context and examples</li>
+                <li>Guide the model to produce high-quality outputs</li>
+                <li>Test and iterate on prompts</li>
+            </ul>
+        </div>
+
+        <!-- Slide 3: Why Prompt Engineering Matters -->
+        <div class="slide">
+            <h2>⭐ Why Prompt Engineering Matters</h2>
+
+            <div class="technique-grid">
+                <div class="technique-card">
+                    <h4>📈 Quality of Output</h4>
+                    <p>Better prompts = Better results. Small changes in wording can dramatically improve responses.</p>
+                </div>
+                <div class="technique-card">
+                    <h4>⚡ Efficiency</h4>
+                    <p>Reduce iterations and refinement time by getting it right the first time.</p>
+                </div>
+                <div class="technique-card">
+                    <h4>🎯 Control</h4>
+                    <p>Steer AI behavior toward your specific goals and constraints.</p>
+                </div>
+                <div class="technique-card">
+                    <h4>💰 Cost</h4>
+                    <p>Fewer API calls needed when prompts are optimized and targeted.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Basic Principles -->
+        <div class="slide">
+            <h2>📚 Basic Principles</h2>
+
+            <h3>1. Clarity</h3>
+            <div class="best-practice">
+                <strong>Be specific:</strong> Instead of "Write about AI", try "Write a 200-word introduction to machine learning for beginners"
+            </div>
+
+            <h3>2. Context</h3>
+            <div class="best-practice">
+                <strong>Provide background:</strong> Include relevant information about the task, audience, and constraints
+            </div>
+
+            <h3>3. Examples</h3>
+            <div class="best-practice">
+                <strong>Show examples:</strong> Provide input-output examples to demonstrate the desired format and style
+            </div>
+
+            <h3>4. Constraints</h3>
+            <div class="best-practice">
+                <strong>Set limits:</strong> Specify length, format, tone, and any restrictions
+            </div>
+        </div>
+
+        <!-- Slide 5: Prompt Structure -->
+        <div class="slide">
+            <h2>🏗️ Effective Prompt Structure</h2>
+
+            <div class="code-block">
+Instruction: [What you want the AI to do]
+Context: [Background information]
+Examples: [Input-output examples]
+Constraints: [Rules and limitations]
+Output Format: [Desired response structure]
+            </div>
+
+            <h3>Example:</h3>
+            <div class="code-block">
+Instruction: Summarize the following text
+Context: For a non-technical manager
+Examples:
+  Input: "Kubernetes is a container orchestration platform..."
+  Output: "It's a tool that automatically manages software applications"
+Constraints: Max 50 words, simple language
+            </div>
+        </div>
+
+        <!-- Slide 6: Zero-Shot vs Few-Shot -->
+        <div class="slide">
+            <h2>🎲 Zero-Shot vs Few-Shot Prompting</h2>
+
+            <table class="comparison-table">
+                <tr>
+                    <th>Approach</th>
+                    <th>Description</th>
+                    <th>Best For</th>
+                </tr>
+                <tr>
+                    <td><strong>Zero-Shot</strong></td>
+                    <td>No examples provided, just instructions</td>
+                    <td>Simple, straightforward tasks</td>
+                </tr>
+                <tr>
+                    <td><strong>Few-Shot</strong></td>
+                    <td>Provide 2-5 examples to improve accuracy</td>
+                    <td>Complex tasks, specific formats</td>
+                </tr>
+            </table>
+
+            <h3>Example Comparison:</h3>
+            <div class="two-column">
+                <div>
+                    <strong>Zero-Shot:</strong>
+                    <div class="code-block">
+Classify this sentiment: "The product is amazing!"
+Positive or Negative?
+                    </div>
+                </div>
+                <div>
+                    <strong>Few-Shot:</strong>
+                    <div class="code-block">
+"Good product" → Positive
+"Terrible support" → Negative
+"Best ever!" → Positive
+
+"The product is amazing!" → ?
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Chain-of-Thought Prompting -->
+        <div class="slide">
+            <h2>🧠 Chain-of-Thought Prompting</h2>
+
+            <p>Encourage the model to explain its reasoning step-by-step, improving accuracy on complex tasks.</p>
+
+            <h3>Technique: Add "Let's think step by step"</h3>
+
+            <div class="example-box">
+                <strong>Without Chain-of-Thought:</strong>
+                <p>Q: If a train travels 100 km at 50 km/h, how long does it take?</p>
+                <p>A: 2 hours</p>
+            </div>
+
+            <div class="best-practice">
+                <strong>With Chain-of-Thought:</strong>
+                <p>Q: If a train travels 100 km at 50 km/h, how long does it take? Let's think step by step.</p>
+                <p>A: Step 1: Distance = 100 km, Speed = 50 km/h<br/>
+                Step 2: Time = Distance ÷ Speed<br/>
+                Step 3: Time = 100 ÷ 50 = 2 hours</p>
+            </div>
+        </div>
+
+        <!-- Slide 8: Role-Based Prompting -->
+        <div class="slide">
+            <h2>👤 Role-Based Prompting</h2>
+
+            <p>Assign a role or persona to the AI to improve response quality and consistency.</p>
+
+            <h3>Examples:</h3>
+            <div class="technique-grid">
+                <div class="technique-card">
+                    <h4>Technical Writer</h4>
+                    <p>"You are a senior technical writer. Explain microservices architecture for developers."</p>
+                </div>
+                <div class="technique-card">
+                    <h4>Product Manager</h4>
+                    <p>"You are a PM. Write a product requirements document for a new feature."</p>
+                </div>
+                <div class="technique-card">
+                    <h4>Code Reviewer</h4>
+                    <p>"You are an expert code reviewer. Review this code and suggest improvements."</p>
+                </div>
+                <div class="technique-card">
+                    <h4>Mentor</h4>
+                    <p>"You are a patient mentoring asking clarifying questions to help learn."</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Temperature and Creativity -->
+        <div class="slide">
+            <h2>🔥 Temperature & Creativity Control</h2>
+
+            <p>Temperature parameter controls randomness/creativity in responses.</p>
+
+            <table class="comparison-table">
+                <tr>
+                    <th>Temperature</th>
+                    <th>Behavior</th>
+                    <th>Use Case</th>
+                </tr>
+                <tr>
+                    <td><strong>0 (Low)</strong></td>
+                    <td>Deterministic, focused, consistent</td>
+                    <td>Facts, code, technical writing</td>
+                </tr>
+                <tr>
+                    <td><strong>0.5-0.7</strong></td>
+                    <td>Balanced, natural, creative but controlled</td>
+                    <td>Most general tasks</td>
+                </tr>
+                <tr>
+                    <td><strong>1.0+ (High)</strong></td>
+                    <td>Random, creative, unpredictable</td>
+                    <td>Brainstorming, creative writing</td>
+                </tr>
+            </table>
+
+            <div class="best-practice">
+                <strong>Recommendation:</strong> Start with 0.7 and adjust based on needs
+            </div>
+        </div>
+
+        <!-- Slide 10: Common Mistakes -->
+        <div class="slide">
+            <h2>⚠️ Common Mistakes to Avoid</h2>
+
+            <div class="warning">
+                <h4>❌ Being Too Vague</h4>
+                <p><strong>Bad:</strong> "Tell me about AI"</p>
+                <p><strong>Good:</strong> "Explain neural networks to a 10-year-old using a simple analogy"</p>
+            </div>
+
+            <div class="warning">
+                <h4>❌ Overwhelming with Information</h4>
+                <p><strong>Bad:</strong> Dumping 10 pages of context at once</p>
+                <p><strong>Good:</strong> Provide only relevant context, structure it clearly</p>
+            </div>
+
+            <div class="warning">
+                <h4>❌ Not Testing Variations</h4>
+                <p><strong>Bad:</strong> Using the first prompt that works</p>
+                <p><strong>Good:</strong> Test multiple variations and choose the best</p>
+            </div>
+
+            <div class="warning">
+                <h4>❌ Ignoring Tone and Style</h4>
+                <p><strong>Bad:</strong> Not specifying expected tone
+                <p><strong>Good:</strong> Specify "formal", "casual", "professional", etc.</p>
+            </div>
+        </div>
+
+        <!-- Slide 11: Advanced Techniques -->
+        <div class="slide">
+            <h2>🚀 Advanced Techniques</h2>
+
+            <h3>1. Prompt Chaining</h3>
+            <div class="example-box">
+                Break complex tasks into multiple prompts where output of one becomes input to the next
+            </div>
+
+            <h3>2. Retrieval Augmented Generation (RAG)</h3>
+            <div class="example-box">
+                Provide relevant documents/context from a database to ground answers
+            </div>
+
+            <h3>3. Meta-Prompting</h3>
+            <div class="example-box">
+                Ask the model to generate better prompts based on your requirements
+            </div>
+
+            <h3>4. Instruction Tuning</h3>
+            <div class="example-box">
+                Fine-tune models on task-specific instructions for domain-specific performance
+            </div>
+        </div>
+
+        <!-- Slide 12: Real-World Applications -->
+        <div class="slide">
+            <h2>🌍 Real-World Applications</h2>
+
+            <div class="technique-grid">
+                <div class="technique-card">
+                    <h4>📝 Content Generation</h4>
+                    <p>Creating articles, emails, social media posts with specific requirements</p>
+                </div>
+                <div class="technique-card">
+                    <h4>🐛 Code Review</h4>
+                    <p>Analyzing code for bugs, performance issues, and best practices</p>
+                </div>
+                <div class="technique-card">
+                    <h4>🔍 Data Analysis</h4>
+                    <p>Extracting insights from raw data with context and constraints</p>
+                </div>
+                <div class="technique-card">
+                    <h4>🎓 Education</h4>
+                    <p>Generating lesson plans, quizzes, and personalized learning content</p>
+                </div>
+                <div class="technique-card">
+                    <h4>💬 Customer Support</h4>
+                    <p>Creating AI assistants with specific tone, knowledge, and escalation rules</p>
+                </div>
+                <div class="technique-card">
+                    <h4>🧪 Testing</h4>
+                    <p>Generating test cases and edge cases with specific parameters</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Best Practices -->
+        <div class="slide">
+            <h2>✅ Best Practices Summary</h2>
+
+            <ul>
+                <li><span class="highlight">Be Specific:</span> Clear, detailed instructions produce better results</li>
+                <li><span class="highlight">Provide Context:</span> Help the model understand the bigger picture</li>
+                <li><span class="highlight">Use Examples:</span> Few-shot prompts often outperform zero-shot</li>
+                <li><span class="highlight">Set Constraints:</span> Specify format, length, tone, and limitations</li>
+                <li><span class="highlight">Test Iterations:</span> Prompt engineering is iterative; refine gradually</li>
+                <li><span class="highlight">Monitor Output:</span> Verify quality and catch hallucinations</li>
+                <li><span class="highlight">Document Prompts:</span> Keep track of effective prompts for reuse</li>
+                <li><span class="highlight">Stay Ethical:</span> Use prompts responsibly and avoid misuse</li>
+            </ul>
+        </div>
+
+        <!-- Slide 14: Testing and Iteration -->
+        <div class="slide">
+            <h2>🔄 Testing & Iteration Strategy</h2>
+
+            <h3>The Optimization Loop:</h3>
+            <div class="schema">
+                <div class="schema-box">📝 Create Prompt</div>
+                <div class="schema-arrow">↓</div>
+                <div class="schema-box">✅ Test Output</div>
+                <div class="schema-arrow">↓</div>
+                <div class="schema-box">📊 Analyze</div>
+                <div class="schema-arrow">↓</div>
+                <div class="schema-box">🔧 Refine</div>
+            </div>
+
+            <h3>Key Metrics:</h3>
+            <ul>
+                <li>Accuracy - Does it answer correctly?</li>
+                <li>Consistency - Same output quality each time?</li>
+                <li>Relevance - On-topic and useful?</li>
+                <li>Format - Matches expected structure?</li>
+            </ul>
+        </div>
+
+        <!-- Slide 15: Prompt Engineering Tools -->
+        <div class="slide">
+            <h2>🛠️ Useful Tools & Resources</h2>
+
+            <div class="technique-grid">
+                <div class="technique-card">
+                    <h4>GPT Playground</h4>
+                    <p>OpenAI's interactive testing environment for prompt development</p>
+                </div>
+                <div class="technique-card">
+                    <h4>LangChain</h4>
+                    <p>Framework for building applications with chains of prompts</p>
+                </div>
+                <div class="technique-card">
+                    <h4>Prompt Frameworks</h4>
+                    <p>STAR, RACE, RTF methods for structuring complex prompts</p>
+                </div>
+                <div class="technique-card">
+                    <h4>Version Control</h4>
+                    <p>Git/GitHub for tracking prompt changes and iterations</p>
+                </div>
+            </div>
+
+            <div class="best-practice">
+                <strong>💡 Tip:</strong> Create a prompt library and document which prompts work best for specific tasks
+            </div>
+        </div>
+
+        <!-- Slide 16: Future of Prompt Engineering -->
+        <div class="slide">
+            <h2>🔮 Future Trends</h2>
+
+            <h3>Emerging Directions:</h3>
+            <ul>
+                <li><strong>Multimodal Prompting:</strong> Combining text, images, and audio in prompts</li>
+                <li><strong>Autonomous Agents:</strong> self-iterating prompts that improve over time</li>
+                <li><strong>Domain-Specific Models:</strong> Specialized models requiring tailored prompting</li>
+                <li><strong>Real-time Adaptation:</strong> Prompts that adjust based on feedback loops</li>
+                <li><strong>Prompt Marketplaces:</strong> Sharing and monetizing effective prompts</li>
+                <li><strong>Visual Prompting:</strong> Using diagrams and visual elements instead of just text</li>
+            </ul>
+
+            <div class="warning">
+                <strong>Note:</strong> As models evolve, prompt engineering techniques will continue to advance
+            </div>
+        </div>
+
+        <!-- Slide 17: Final Takeaways -->
+        <div class="slide active">
+            <div class="slide-title">
+                <h1>💡 Key Takeaways</h1>
+                <div style="margin-top: 50px; text-align: left;">
+                    <p style="margin: 20px 0; font-size: 1.2em;"><strong>✓</strong> Prompt engineering is a critical skill for AI-driven development</p>
+                    <p style="margin: 20px 0; font-size: 1.2em;"><strong>✓</strong> Clear, specific, contextual prompts produce superior results</p>
+                    <p style="margin: 20px 0; font-size: 1.2em;"><strong>✓</strong> Testing and iteration are essential to optimization</p>
+                    <p style="margin: 20px 0; font-size: 1.2em;"><strong>✓</strong> Advanced techniques unlock new possibilities</p>
+                    <p style="margin: 20px 0; font-size: 1.2em;"><strong>✓</strong> Continuous learning keeps you ahead</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <button onclick="previousSlide()">← Previous</button>
+            <span class="slide-counter"><span id="currentSlide">1</span> / <span id="totalSlides">17</span></span>
+            <button onclick="nextSlide()">Next →</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = document.querySelectorAll('.slide').length;
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+
+            if (n > totalSlides) {
+                currentSlide = totalSlides;
+            }
+            if (n < 1) {
+                currentSlide = 1;
+            }
+
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[currentSlide - 1].classList.add('active');
+
+            document.getElementById('currentSlide').textContent = currentSlide;
+
+            // Update progress bar
+            const progress = (currentSlide / totalSlides) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function nextSlide() {
+            currentSlide++;
+            showSlide(currentSlide);
+        }
+
+        function previousSlide() {
+            currentSlide--;
+            showSlide(currentSlide);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') previousSlide();
+        });
+
+        // Initialize
+        showSlide(currentSlide);
+    </script>
+</body>
+</html>

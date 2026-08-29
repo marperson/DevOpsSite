@@ -1,7 +1,7 @@
 ---
 title: "Running Elasticsearch on OpenShift with ECK: Ingress, East-West Networking, and CCR"
 date: 2026-08-24
-tags: ["elasticsearch", "openshift", "eck", "kubernetes", "ccr", "observability"]
+tags: ["elasticsearch", "openshift", "eck", "kubernetes", "ccr", "observability", "devops", "deep-dive", "search"]
 description: "A practical guide to deploying Elasticsearch with ECK on OpenShift, exposing it through T2 and East-West gateways, and validating two-cluster cross-cluster replication."
 featuredImage: "feature.png"
 draft: false

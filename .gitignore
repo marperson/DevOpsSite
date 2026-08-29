@@ -183,3 +183,13 @@ cython_debug/
 site/public/
 site/resources/
 site/.hugo_build.lock
+
+# OS / editor junk
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Hugo build artifacts (defense in depth)
+site/themes/*/exampleSite/
+site/themes/*/exampleSite/.hugo_build.lock

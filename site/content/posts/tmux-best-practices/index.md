@@ -2,7 +2,7 @@
 
 title: "Mastering tmux: Usage, Best Practices, and Code Examples"
 date: 2026-03-15
-tags: ["tmux", "unix"]
+tags: ["tmux", "terminal", "productivity", "unix", "devops", "best-practices", "tutorial"]
 description: "Tmux introcution with best practices."
 featuredImage: "feature.png"
 ---

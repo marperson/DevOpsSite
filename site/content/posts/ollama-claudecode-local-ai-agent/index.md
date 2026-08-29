@@ -3,7 +3,7 @@ title: "Running Claude Code with Ollama: Build Local AI Coding Agents"
 date: 2026-03-16
 draft: false
 description: "Learn how to run Claude Code with Ollama to create private AI coding agents on your local machine using open-source LLMs."
-tags: ["ollama","claude code","ai coding assistant","local llm","developer tools"]
+tags: ["ollama", "claude-code", "ai", "local-llm", "developer-tools", "devops", "tutorial"]
 featuredImage: "feature.png"
 ---
 # Running Claude Code with Ollama: Local AI Agents for Developers

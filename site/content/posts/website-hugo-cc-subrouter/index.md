@@ -2,7 +2,7 @@
 
 title: "Building a Personal Website with Hugo, Claude Code, and SubRouter.ai on GitHub Pages"
 date: 2026-03-15
-tags: ["hugo", "github-pages", "claude", "ai", "subrouter", "static-site"]
+tags: ["hugo", "github-pages", "claude-code", "ai", "subrouter", "static-site", "devops", "tutorial", "web"]
 description: "A step-by-step guide to building and deploying a Hugo-powered personal website using Claude Code and SubRouter.ai as the token provider."
 featuredImage: "feature.png"
 ---
